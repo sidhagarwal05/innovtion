@@ -272,7 +272,9 @@ class _UserInfoScreenState extends State<UserInfoScreen>
                                             radius: 30,
                                             backgroundImage: _image != null
                                                 ? FileImage(_image)
-                                                : NetworkImage(url),
+                                                : url == null
+                                                    ? null
+                                                    : NetworkImage(url),
                                             backgroundColor: _image == null
                                                 ? Colors.transparent
                                                 : null,
@@ -308,7 +310,8 @@ class _UserInfoScreenState extends State<UserInfoScreen>
                                           style: TextStyle(fontSize: 18),
                                         ),
                                   onPressed: () async {
-                                    if ((_nameController == null)) {
+                                    if ((_nameController == null ||
+                                        _phoneController == null)) {
                                       showDialog(
                                           context: context,
                                           child: AlertDialog(
@@ -322,7 +325,7 @@ class _UserInfoScreenState extends State<UserInfoScreen>
                                                   fontWeight: FontWeight.bold),
                                             ),
                                             content: Text(
-                                                "State and city is mandatory"),
+                                                "Name and Phone Number are mandatory"),
                                             actions: <Widget>[
                                               MaterialButton(
                                                 child: Text(
