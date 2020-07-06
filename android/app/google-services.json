@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "934741543864",
+    "firebase_url": "https://innovation-ef3ef.firebaseio.com",
+    "project_id": "innovation-ef3ef",
+    "storage_bucket": "innovation-ef3ef.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:934741543864:android:605fb01e4bfcaf73399d4d",
+        "android_client_info": {
+          "package_name": "com.goga.innovtion"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "934741543864-55km1ujkvt279rge3di450iujqq7772l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.goga.innovtion",
+            "certificate_hash": "bfbf4ac4da191f757906d46517e2393986f8eb02"
+          }
+        },
+        {
+          "client_id": "934741543864-va2fje2mg1d47gmt1bnu64kus0s6tu1g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAiC7TDtluuyzbNXf_7lbnnh1V2KBY-lSY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "934741543864-va2fje2mg1d47gmt1bnu64kus0s6tu1g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
