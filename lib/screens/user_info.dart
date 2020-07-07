@@ -500,7 +500,8 @@ class _UserInfoScreenState extends State<UserInfoScreen>
           'name': _nameController.text,
           'phone': _phoneController.text,
           'status': false,
-          'image': _image == null ? null : url,
+          'image': _image == null ? 'A' : url,
+          'Paytm': true,
         }).then((value) {
           print("Success");
           return true;
