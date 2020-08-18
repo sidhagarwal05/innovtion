@@ -1,38 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:innovtion/providers/auth.dart';
+import 'package:innovtion/screens/inventory.dart';
+import 'package:innovtion/screens/user_info.dart';
+import 'home.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:innovtion/screens/page.dart';
-import 'package:innovtion/screens/splash_screen.dart';
 
 final _firestore = Firestore.instance;
 FirebaseUser loggedInUser;
 String userId;
 final _auth = FirebaseAuth.instance;
 var reference;
-TextEditingController _phoneController = new TextEditingController();
-GlobalKey<FormState> _formkey = GlobalKey<FormState>();
-final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
-class Base extends StatefulWidget {
-  static const routeName = '/base-screen';
+class PreviousOrder extends StatefulWidget {
+  static const routeName = '/previousOrders';
 
   @override
-  _BaseState createState() => _BaseState();
+  _PreviousOrderState createState() => _PreviousOrderState();
 }
 
-class _BaseState extends State<Base> with SingleTickerProviderStateMixin {
+class _PreviousOrderState extends State<PreviousOrder>
+    with SingleTickerProviderStateMixin {
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     getCurrentUser();
   }
-
-//  @override
-//  void dispose() {
-//    _phoneController.dispose();
-//    super.dispose();
-//  }
 
   void getCurrentUser() async {
     try {
@@ -49,29 +43,36 @@ class _BaseState extends State<Base> with SingleTickerProviderStateMixin {
     }
   }
 
+  String dropdownValue = '';
+  var _items = ['userprofile', 'logout', 'Inventory'];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Form(
-          key: _formkey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              SizedBox(
-                height: 20,
-              ),
-              Text(
-                "New Orders",
-                style: TextStyle(
-                    color: Colors.teal,
-                    fontSize: 50,
-                    fontWeight: FontWeight.bold),
-              ),
-              MessagesStream(),
-            ],
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            SizedBox(
+              height: 20,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Expanded(
+                  child: Text(
+                    "Previous Orders",
+                    style: TextStyle(
+                        color: Colors.teal,
+                        fontSize: 45,
+                        fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+            ),
+            MessagesStream(),
+          ],
         ),
       ),
     );
@@ -84,7 +85,7 @@ class MessagesStream extends StatelessWidget {
     return StreamBuilder<QuerySnapshot>(
       stream: _firestore
           .collection('Outlet/$userId/orders')
-          .orderBy('Order Time')
+          .orderBy('Order Time', descending: true)
           .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
@@ -97,14 +98,13 @@ class MessagesStream extends StatelessWidget {
         final messages = snapshot.data.documents;
         List<MessageBubble> messageBubbles = [];
         for (var message in messages) {
-          if (message.data['New'] == true) {
+          if (message.data['New'] == false) {
             var order = message.data['order'];
             order = order.substring(0, order.length - 2);
             final price = message.data['Price'];
             final time = message.data['Order Time'];
             final reference = message.data['reference'];
             final user = message.data['user'];
-            final document = message.documentID;
             print(" hi $order");
             final messageBubble = MessageBubble(
               price: price,
@@ -112,7 +112,6 @@ class MessagesStream extends StatelessWidget {
               time: time,
               user: user,
               reference: reference,
-              document: document,
             );
             messageBubbles.add(messageBubble);
           }
@@ -129,20 +128,13 @@ class MessagesStream extends StatelessWidget {
 }
 
 class MessageBubble extends StatefulWidget {
-  MessageBubble(
-      {this.order,
-      this.price,
-      this.time,
-      this.reference,
-      this.user,
-      this.document});
+  MessageBubble({this.order, this.price, this.time, this.reference, this.user});
 
   final price;
   final order;
   final time;
   final user;
   final reference;
-  final document;
   @override
   _MessageBubbleState createState() => _MessageBubbleState();
 }
@@ -203,183 +195,91 @@ class _MessageBubbleState extends State<MessageBubble> {
 
                         return Column(
                           children: <Widget>[
-                            Container(
-                              child: Column(
-                                children: <Widget>[
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 8),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: <Widget>[
-                                        Text(
-                                          "Total Price:  ₹",
-                                          style: TextStyle(
-                                            fontSize: 20,
-                                          ),
-                                        ),
-                                        Text(
-                                          userDocument["Price"].toString(),
-                                          style: TextStyle(
-                                            fontSize: 20,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        bottom: 8, left: 8, top: 8),
-                                    child: userDocument["Place"] != null
-                                        ? Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: <Widget>[
-                                              Text(
-                                                "Location: ",
-                                                style: TextStyle(
-                                                  fontSize: 20,
-                                                ),
-                                              ),
-                                              Text(
-                                                userDocument["Place"],
-                                                style: TextStyle(
-                                                  fontSize: 20,
-                                                ),
-                                              ),
-                                            ],
-                                          )
-                                        : Text(
-                                            "Order PickUp",
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Text(
+                              userDocument["Accepted"] == false ||
+                                      userDocument["Accepted"] == null
+                                  ? userDocument["Cancelled"] == false ||
+                                          userDocument["Cancelled"] == null
+                                      ? 'Waiting for the Restaurant to Accept the Order'
+                                      : "Order has been cancelled due to unavailability of item/ Restaurant has been closed"
+                                  : 'Order Accepted',
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.blue[700],
+                                  backgroundColor: Colors.grey[200]),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+//                            userDocument['deliveryTime'] == null ||
+//                                    userDocument['deliveryTime'] == ""
+//                                ? Container()
+//                                : Text(
+//                                    'Order will reach you in ${userDocument['deliveryTime']} minutes',
+//                                    style: TextStyle(
+//                                        fontSize: 18,
+//                                        backgroundColor: Colors.grey[200]),
+//                                  ),
+                            Card(
+                              elevation: 3,
+                              child: Container(
+                                color: Colors.teal,
+                                child: Column(
+                                  children: <Widget>[
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: <Widget>[
+                                          Text(
+                                            "Total Price:  ₹",
                                             style: TextStyle(
-                                              fontSize: 20,
-                                            ),
+                                                fontSize: 20,
+                                                color: Colors.white),
                                           ),
-                                  ),
-                                ],
+                                          Text(
+                                            userDocument["Price"].toString(),
+                                            style: TextStyle(
+                                                fontSize: 20,
+                                                color: Colors.white),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          bottom: 8, left: 8, top: 8),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: <Widget>[
+                                          Text(
+                                            "Location: ",
+                                            style: TextStyle(
+                                                fontSize: 20,
+                                                color: Colors.white),
+                                          ),
+                                          Text(
+                                            userDocument["Place"],
+                                            style: TextStyle(
+                                                fontSize: 20,
+                                                color: Colors.white),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ],
                         );
                       }),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      RaisedButton(
-                        onPressed: () async {
-                          showDialog(
-                              context: context,
-                              builder: (context) {
-                                return AlertDialog(
-                                  title: Text('Select the Time'),
-                                  content: Container(
-                                    width: double.infinity,
-                                    padding: EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                        color: Colors.grey[300],
-                                        borderRadius:
-                                            BorderRadius.circular(20)),
-                                    child: TextFormField(
-                                      keyboardType: TextInputType.number,
-                                      autocorrect: false,
-                                      controller: _phoneController,
-                                      maxLines: 1,
-                                      decoration: InputDecoration(
-                                          icon: Icon(
-                                            Icons.access_time,
-                                            size: 40,
-                                            color: Colors.black,
-                                          ),
-                                          enabledBorder: InputBorder.none,
-                                          labelText: 'Time',
-                                          hintText: "Enter the time",
-                                          labelStyle: TextStyle(
-                                              decorationStyle:
-                                                  TextDecorationStyle.solid)),
-                                    ),
-                                  ),
-                                  actions: <Widget>[
-                                    RaisedButton(
-                                      color: Colors.teal,
-                                      onPressed: () async {
-                                        final userinforesult =
-                                            await widget.reference.updateData({
-                                          'Accepted': true,
-                                          'deliveryTime': _phoneController.text,
-                                        }).then((value) {
-                                          print("Success");
-                                          return true;
-                                        });
-                                        final userinforesult1 = await Firestore
-                                            .instance
-                                            .collection("Outlet/$userId/orders")
-                                            .document(widget.document)
-                                            .updateData({
-                                          'New': false,
-                                        }).then((value) {
-                                          print("Success");
-                                          return true;
-                                        });
-                                        Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    SplashScreen()));
-                                      },
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          'Done',
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                );
-                              });
-                        },
-                        elevation: 3,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            'Accept Order',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                        color: Colors.blue,
-                      ),
-                      RaisedButton(
-                        onPressed: () async {
-                          final userinforesult3 = await Firestore.instance
-                              .collection("Outlet/$userId/orders")
-                              .document(widget.document)
-                              .updateData({
-                            'New': false,
-                          }).then((value) {
-                            print("Success");
-                            return true;
-                          });
-                          final userinforesult2 =
-                              await widget.reference.updateData({
-                            'Cancelled': true,
-                          }).then((value) {
-                            print("Success");
-                            return true;
-                          });
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => SplashScreen()));
-                        },
-                        elevation: 3,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            'Cancel Order',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                        color: Colors.red,
-                      ),
-                    ],
-                  ),
                 ],
               );
             });
@@ -434,10 +334,7 @@ class MessagesStream1 extends StatelessWidget {
             ),
           );
         }
-
         final messages = snapshot.data.documents;
-
-//
         List<MessageBubble1> messageBubbles1 = [];
         for (var message in messages) {
           final name = message.data['Name'];

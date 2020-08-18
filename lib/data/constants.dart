@@ -70,19 +70,19 @@ var complaintText = RichText(
 
 var userInfoText = RichText(
   text: TextSpan(
-      text: "User",
+      text: "USER",
       style: TextStyle(
           fontWeight: FontWeight.bold,
           fontSize: 40,
           letterSpacing: 1,
-          color: Colors.black),
+          color: Colors.teal),
       children: <TextSpan>[
         TextSpan(
-            text: "Information",
+            text: " INFO",
             style: TextStyle(
                 letterSpacing: 1,
                 fontSize: 40,
-                color: Colors.grey[500],
+                color: Colors.teal,
                 fontFamily: "Sans Serif"))
       ]),
 );

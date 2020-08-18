@@ -1,19 +1,23 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
 import 'package:image_picker/image_picker.dart';
-
 import 'dart:io';
-
+import 'package:lite_rolling_switch/lite_rolling_switch.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:innovtion/data/constants.dart';
+import 'package:innovtion/providers/auth.dart';
+import 'package:innovtion/screens/page.dart';
+import 'home.dart';
 
-import 'base.dart';
+bool isupdate = false;
+bool status = true;
 
 class UserInfoScreen extends StatefulWidget {
   static const routeName = '/user-info';
-
+  UserInfoScreen(bool value) {
+    isupdate = value;
+  }
   @override
   _UserInfoScreenState createState() => _UserInfoScreenState();
 }
@@ -22,7 +26,7 @@ class _UserInfoScreenState extends State<UserInfoScreen>
     with SingleTickerProviderStateMixin {
   final databaseReference = Firestore.instance;
   final _auth = FirebaseAuth.instance;
-  bool isupdate = false;
+
   File _image;
   var url;
 
@@ -56,6 +60,7 @@ class _UserInfoScreenState extends State<UserInfoScreen>
   void initState() {
     super.initState();
     checkInternet();
+    fetchData2();
     _animationController = new AnimationController(
         vsync: this, duration: Duration(milliseconds: 600));
     _animation =
@@ -71,7 +76,7 @@ class _UserInfoScreenState extends State<UserInfoScreen>
       setState(() {
         loading = true;
       });
-      isupdate = ModalRoute.of(context).settings.arguments ?? false;
+
       if (isupdate) {
         final result = await fetchData();
         if (result) {}
@@ -103,16 +108,48 @@ class _UserInfoScreenState extends State<UserInfoScreen>
                           child: Container(
                             padding: EdgeInsets.all(25),
                             child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
                                 userInfoText,
                                 SizedBox(
                                   height: 25,
                                 ),
+                                LiteRollingSwitch(
+                                  //initial value
+                                  value: status,
+                                  textOn: 'OPEN',
+                                  textOff: 'CLOSED',
+                                  colorOn: Colors.greenAccent[700],
+                                  colorOff: Colors.redAccent[700],
+                                  iconOn: Icons.done,
+                                  iconOff: Icons.remove_circle_outline,
+                                  textSize: 17.0,
+                                  onChanged: (bool state) async {
+                                    final uid = await _auth
+                                        .currentUser()
+                                        .then((value) => value.uid);
+                                    final userinforesult =
+                                        await Firestore.instance
+                                            .collection("Outlet")
+                                            .document(uid
+//                                            "JTDWiaeze2QR2CLmt3a5qR1yief2"
+                                                )
+                                            .updateData({
+                                      'status': state,
+                                    }).then((value) {
+                                      print("Success");
+                                      return true;
+                                    });
+                                  },
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
                                 Container(
                                   width: double.infinity,
                                   padding: EdgeInsets.all(8),
                                   decoration: BoxDecoration(
-                                      color: Colors.grey[300],
+                                      color: Colors.blueGrey[300],
                                       borderRadius: BorderRadius.circular(20)),
                                   child: TextFormField(
                                     keyboardType: TextInputType.text,
@@ -146,7 +183,7 @@ class _UserInfoScreenState extends State<UserInfoScreen>
                                   width: double.infinity,
                                   padding: EdgeInsets.all(8),
                                   decoration: BoxDecoration(
-                                      color: Colors.grey[300],
+                                      color: Colors.blueGrey[300],
                                       borderRadius: BorderRadius.circular(20)),
                                   child: TextFormField(
                                     keyboardType: TextInputType.number,
@@ -283,7 +320,7 @@ class _UserInfoScreenState extends State<UserInfoScreen>
                                       ),
                                     ),
                                     elevation: 5,
-                                    color: Colors.greenAccent,
+                                    color: Colors.teal[300],
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10),
                                     ),
@@ -295,7 +332,7 @@ class _UserInfoScreenState extends State<UserInfoScreen>
                                 MaterialButton(
                                   padding: EdgeInsets.symmetric(
                                       vertical: 16, horizontal: 38),
-                                  color: Colors.black,
+                                  color: Colors.teal,
                                   textColor: Colors.white,
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(20)),
@@ -423,7 +460,7 @@ class _UserInfoScreenState extends State<UserInfoScreen>
                                           });
                                           Navigator.of(context)
                                               .pushReplacementNamed(
-                                                  Base.routeName);
+                                                  Page1.routeName);
                                         } else {
                                           print('not done');
                                         }
@@ -434,6 +471,33 @@ class _UserInfoScreenState extends State<UserInfoScreen>
                                     }
                                   },
                                 ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                isupdate == true
+                                    ? RaisedButton(
+                                        elevation: 4,
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: 16, horizontal: 38),
+                                        color: Colors.teal,
+                                        textColor: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20)),
+                                        child: Text(
+                                          "LOGOUT",
+                                          style: TextStyle(fontSize: 15),
+                                        ),
+                                        onPressed: () async {
+                                          final signoutResult =
+                                              await Auth().signOut();
+                                          if (signoutResult) {
+                                            Navigator.of(context)
+                                                .pushReplacementNamed(
+                                                    HomeScreen.routeName);
+                                          }
+                                        })
+                                    : Container()
                               ],
                             ),
                           ),
@@ -476,6 +540,17 @@ class _UserInfoScreenState extends State<UserInfoScreen>
     return true;
   }
 
+  Future<bool> fetchData2() async {
+    final uid = await _auth.currentUser().then((value) => value.uid);
+    final data = Firestore.instance.collection('Outlet').document(uid);
+    final result = await data.get();
+    setState(() {
+      status = result["status"];
+    });
+
+    return true;
+  }
+
   Future<bool> sendData(bool isupdate) async {
     try {
       final uid = await _auth.currentUser().then((value) => value.uid);
@@ -502,6 +577,11 @@ class _UserInfoScreenState extends State<UserInfoScreen>
           'status': false,
           'image': _image == null ? 'A' : url,
           'Paytm': true,
+          'Discount': 0,
+          'Minimum Order': 0,
+          'Discount': 0,
+          'Delivery Charge': 0,
+          'Tax': 0,
         }).then((value) {
           print("Success");
           return true;

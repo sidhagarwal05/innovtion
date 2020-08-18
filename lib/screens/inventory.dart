@@ -60,32 +60,6 @@ class _InventoryState extends State<Inventory> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 4,
-        title: FittedBox(
-          fit: BoxFit.contain,
-          child: RichText(
-            text: TextSpan(
-                text: "Inven",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 35,
-                    letterSpacing: 1,
-                    color: Colors.black),
-                children: <TextSpan>[
-                  TextSpan(
-                      text: "tory",
-                      style: TextStyle(
-                          letterSpacing: 1,
-                          fontSize: 35,
-                          color: Colors.grey[500],
-                          fontFamily: "Sans Serif"))
-                ]),
-          ),
-        ),
-      ),
       body: SafeArea(
         child: Container(
           child: Column(
@@ -93,6 +67,27 @@ class _InventoryState extends State<Inventory> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
+              SizedBox(
+                height: 20,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Expanded(
+                    child: Text(
+                      "Inventory",
+                      style: TextStyle(
+                          color: Colors.teal,
+                          fontSize: 45,
+                          fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 20,
+              ),
               MessagesStream(),
             ],
           ),
@@ -224,7 +219,7 @@ class _InventoryState extends State<Inventory> {
               });
         },
         child: Icon(Icons.add),
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.teal,
       ),
     );
   }
