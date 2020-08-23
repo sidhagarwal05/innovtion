@@ -1,10 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:lite_rolling_switch/lite_rolling_switch.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+
 import 'package:innovtion/data/constants.dart';
 import 'package:innovtion/providers/auth.dart';
 import 'package:innovtion/screens/page.dart';
@@ -26,9 +25,6 @@ class _UserInfoScreenState extends State<UserInfoScreen>
     with SingleTickerProviderStateMixin {
   final databaseReference = Firestore.instance;
   final _auth = FirebaseAuth.instance;
-
-  File _image;
-  var url;
 
   AnimationController _animationController;
   Animation<double> _animation;
@@ -211,119 +207,6 @@ class _UserInfoScreenState extends State<UserInfoScreen>
                                         labelStyle: TextStyle(
                                             decorationStyle:
                                                 TextDecorationStyle.solid)),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                GestureDetector(
-                                  onTap: () {
-                                    showDialog(
-                                        context: context,
-                                        child: AlertDialog(
-                                          backgroundColor: Colors.white,
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(20)),
-                                          title: Text(
-                                            "Choose an Option",
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                          actions: <Widget>[
-                                            MaterialButton(
-                                              child: Text(
-                                                "Gallery",
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              onPressed: () async {
-                                                final picker = ImagePicker();
-                                                final pickedImage =
-                                                    await picker.getImage(
-                                                        source:
-                                                            ImageSource.gallery,
-                                                        imageQuality: 60,
-                                                        maxWidth: 150);
-                                                setState(() {
-                                                  _image =
-                                                      File(pickedImage.path);
-                                                });
-
-                                                Navigator.of(context).pop();
-                                              },
-                                            ),
-                                            MaterialButton(
-                                              child: Text(
-                                                "Camera",
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              onPressed: () async {
-                                                final picker = ImagePicker();
-                                                final pickedImage =
-                                                    await picker.getImage(
-                                                        source:
-                                                            ImageSource.camera,
-                                                        imageQuality: 60,
-                                                        maxWidth: 150);
-                                                setState(() {
-                                                  _image =
-                                                      File(pickedImage.path);
-                                                });
-
-                                                Navigator.of(context).pop();
-                                              },
-                                            )
-                                          ],
-                                        ));
-                                  },
-                                  child: Card(
-                                    child: Padding(
-                                      padding: EdgeInsets.all(20),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: <Widget>[
-                                          Row(
-                                            children: <Widget>[
-                                              Icon(
-                                                Icons.image,
-                                                size: 40,
-                                                color: Colors.blueGrey[800],
-                                              ),
-                                              SizedBox(
-                                                width: 20,
-                                              ),
-                                              Text(
-                                                'Image',
-                                                style: TextStyle(
-                                                  fontSize: 25,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          CircleAvatar(
-                                            radius: 30,
-                                            backgroundImage: _image != null
-                                                ? FileImage(_image)
-                                                : url == null
-                                                    ? null
-                                                    : NetworkImage(url),
-                                            backgroundColor: _image == null
-                                                ? Colors.transparent
-                                                : null,
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                    elevation: 5,
-                                    color: Colors.teal[300],
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
                                   ),
                                 ),
                                 SizedBox(
@@ -535,8 +418,7 @@ class _UserInfoScreenState extends State<UserInfoScreen>
     final result = await data.get();
     _nameController.text = result['name'];
     _phoneController.text = (result['phone']);
-    url = (result['image']);
-    print('url:' + url);
+
     return true;
   }
 
@@ -555,16 +437,10 @@ class _UserInfoScreenState extends State<UserInfoScreen>
     try {
       final uid = await _auth.currentUser().then((value) => value.uid);
 
-      if (_image != null) {
-        final ref2 = FirebaseStorage.instance.ref().child(uid + '.jpg');
-        await ref2.putFile(_image).onComplete;
-        url = await ref2.getDownloadURL();
-      }
       if (isupdate) {
         await databaseReference.collection("Outlet").document(uid).updateData({
           'name': _nameController.text,
           'phone': _phoneController.text,
-          'image': _image == null ? null : url,
         }).then((value) {
           print("Success");
           return true;
@@ -575,7 +451,7 @@ class _UserInfoScreenState extends State<UserInfoScreen>
           'name': _nameController.text,
           'phone': _phoneController.text,
           'status': false,
-          'image': _image == null ? 'A' : url,
+          'image': null,
           'Paytm': true,
           'Discount': 0,
           'Minimum Order': 0,

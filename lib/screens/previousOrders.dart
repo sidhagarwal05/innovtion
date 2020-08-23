@@ -258,17 +258,30 @@ class _MessageBubbleState extends State<MessageBubble> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: <Widget>[
-                                          Text(
-                                            "Location: ",
+                                          userDocument["Place"] != null
+                                              ? Row(
+                                            mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                            children: <Widget>[
+                                              Text(
+                                                "Location: ",
+                                                style: TextStyle(
+                                                  fontSize: 20,
+                                                ),
+                                              ),
+                                              Text(
+                                                userDocument["Place"],
+                                                style: TextStyle(
+                                                  fontSize: 20,
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                              : Text(
+                                            "Order PickUp",
                                             style: TextStyle(
-                                                fontSize: 20,
-                                                color: Colors.white),
-                                          ),
-                                          Text(
-                                            userDocument["Place"],
-                                            style: TextStyle(
-                                                fontSize: 20,
-                                                color: Colors.white),
+                                              fontSize: 20,
+                                            ),
                                           ),
                                         ],
                                       ),

@@ -314,10 +314,29 @@ class _MessageBubbleState extends State<MessageBubble> {
                 children: <Widget>[
                   GestureDetector(
                     onTap: () async {
-                      final userinforesult = await Firestore.instance
-                          .collection("Outlet/$uid/Menu")
-                          .document(widget.documentid)
-                          .delete();
+                      showDialog(
+                        context: context,
+                        builder: (context) => new AlertDialog(
+                          title: new Text('Are you sure?'),
+                          content: new Text('Do you want to delete this item?'),
+                          actions: <Widget>[
+                            new FlatButton(
+                              onPressed: () => Navigator.of(context).pop(false),
+                              child: new Text('No'),
+                            ),
+                            new FlatButton(
+                              onPressed: () async {
+                                await Firestore.instance
+                                    .collection("Outlet/$uid/Menu")
+                                    .document(widget.documentid)
+                                    .delete();
+                                Navigator.of(context).pop(false);
+                              },
+                              child: new Text('Yes'),
+                            ),
+                          ],
+                        ),
+                      );
                     },
                     child: Icon(
                       Icons.delete,
