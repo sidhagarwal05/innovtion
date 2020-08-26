@@ -10,8 +10,8 @@ String userId;
 final _auth = FirebaseAuth.instance;
 var reference;
 TextEditingController _phoneController = new TextEditingController();
-GlobalKey<FormState> _formkey = GlobalKey<FormState>();
-final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+// GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+// final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
 class Base extends StatefulWidget {
   static const routeName = '/base-screen';
@@ -54,24 +54,21 @@ class _BaseState extends State<Base> with SingleTickerProviderStateMixin {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Form(
-          key: _formkey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              SizedBox(
-                height: 20,
-              ),
-              Text(
-                "New Orders",
-                style: TextStyle(
-                    color: Colors.teal,
-                    fontSize: 50,
-                    fontWeight: FontWeight.bold),
-              ),
-              MessagesStream(),
-            ],
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            SizedBox(
+              height: 20,
+            ),
+            Text(
+              "New Orders",
+              style: TextStyle(
+                  color: Colors.teal,
+                  fontSize: 50,
+                  fontWeight: FontWeight.bold),
+            ),
+            MessagesStream(),
+          ],
         ),
       ),
     );
