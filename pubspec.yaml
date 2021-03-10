@@ -45,6 +45,7 @@ dev_dependencies:
   shared_preferences: ^0.5.7+3
   lite_rolling_switch: ^0.1.1
   curved_navigation_bar: ^0.3.3
+  firebase_messaging: ^6.0.12
 
 
 # For information on the generic Dart part of this file, see the
