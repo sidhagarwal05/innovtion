@@ -172,12 +172,16 @@ class _MessageBubbleState extends State<MessageBubble> {
                                         color: Colors.teal,
                                         fontWeight: FontWeight.bold),
                                   ),
-                                  Text(
-                                    userDocument["phone"],
-                                    style: TextStyle(
-                                        fontSize: 20,
-                                        color: Colors.teal,
-                                        fontWeight: FontWeight.bold),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        userDocument["phone"],
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            color: Colors.teal,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
@@ -260,29 +264,29 @@ class _MessageBubbleState extends State<MessageBubble> {
                                         children: <Widget>[
                                           userDocument["Place"] != null
                                               ? Row(
-                                            mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                            children: <Widget>[
-                                              Text(
-                                                "Location: ",
-                                                style: TextStyle(
-                                                  fontSize: 20,
-                                                ),
-                                              ),
-                                              Text(
-                                                userDocument["Place"],
-                                                style: TextStyle(
-                                                  fontSize: 20,
-                                                ),
-                                              ),
-                                            ],
-                                          )
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: <Widget>[
+                                                    Text(
+                                                      "Location: ",
+                                                      style: TextStyle(
+                                                        fontSize: 20,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      userDocument["Place"],
+                                                      style: TextStyle(
+                                                        fontSize: 20,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                )
                                               : Text(
-                                            "Order PickUp",
-                                            style: TextStyle(
-                                              fontSize: 20,
-                                            ),
-                                          ),
+                                                  "Order PickUp",
+                                                  style: TextStyle(
+                                                    fontSize: 20,
+                                                  ),
+                                                ),
                                         ],
                                       ),
                                     ),

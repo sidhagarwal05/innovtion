@@ -454,9 +454,9 @@ class _UserInfoScreenState extends State<UserInfoScreen>
           'image': null,
           'Paytm': true,
           'Discount': 0,
-          'Minimum Order': 0,
+          'MinOrder': 0,
           'Discount': 0,
-          'Delivery Charge': 0,
+          'DeliveryCharge': 0,
           'Tax': 0,
         }).then((value) {
           print("Success");
